@@ -1,0 +1,47 @@
+version: 2.1
+jobs:
+  build_and_test:
+    docker:
+      - image: continuumio/miniconda3
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-zerozero-dev-{{ checksum "setup.py" }}-{{ checksum "conda_env.yml"}}
+      - run:
+          name: Setup conda environment
+          command: |
+            if [ ! -d /opt/conda/envs/zerozero/bin ]; then
+              conda env create -f conda_env.yml
+            fi
+      - run:
+          name: Install requirements
+          command: |
+            conda run -n zerozero pip install -e ."[dev]"
+      - save_cache:
+          key: v1-zerozero-dev-{{ checksum "setup.py" }}-{{ checksum "conda_env.yml"}}
+          paths:
+            - /opt/conda/envs/zerozero/
+      - run:
+          name: Run test
+          command: |
+            conda run -n zerozero pytest --cov-report=term-missing --junitxml=test-results/result.xml
+      - run:
+          name: Check Coverage Ran
+          command: |
+            if [ ! -f ./.coverage ]; then
+              echo "Someone messed up and now CI/CD isn't checking coverage!" 1>&2
+              exit 64
+            fi
+      - store_test_results:
+          path: test-results
+      - run:
+          name: Run linting
+          command: |
+            conda run -n zerozero black . --check
+workflows:
+  on_commit:
+    jobs:
+      - build_and_test:
+          filters:
+            branches:
+              ignore: main # Tests have to be passing and ahead of main to be merged so we don't need to run them twice`
