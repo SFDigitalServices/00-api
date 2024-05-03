@@ -5,6 +5,10 @@ jobs:
       - image: continuumio/miniconda3
     steps:
       - checkout
+      - run:
+          name: Run linting
+          command: |
+            conda run -n zerozero black . --check
       - restore_cache:
           key: v1-zerozero-dev-{{ checksum "setup.py" }}-{{ checksum "conda_env.yml"}}
       - run:
@@ -34,10 +38,6 @@ jobs:
             fi
       - store_test_results:
           path: test-results
-      - run:
-          name: Run linting
-          command: |
-            conda run -n zerozero black . --check
 workflows:
   on_commit:
     jobs:
