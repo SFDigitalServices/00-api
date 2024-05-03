@@ -21,6 +21,7 @@ from rest_framework.relations import (
     StringRelatedField,
 )
 
+from django.utils.text import capfirst
 from zerozero.registry import get_model_path, REGISTERED_MODELS
 
 
