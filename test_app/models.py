@@ -17,6 +17,7 @@ class ExamplesChild(models.Model):
         on_delete=models.CASCADE,
         related_name="children",
         related_query_name="children",
+        verbose_name="parent alias",
     )
 
 
