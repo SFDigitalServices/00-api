@@ -14,13 +14,13 @@ jobs:
               conda env create -f conda_env.yml
             fi
       - run:
-          name: Run linting
-          command: |
-            conda run -n zerozero black . --check
-      - run:
           name: Install requirements
           command: |
             conda run -n zerozero pip install -e ."[dev]"
+      - run:
+          name: Run linting
+          command: |
+            conda run -n zerozero black . --check
       - save_cache:
           key: v1-zerozero-dev-{{ checksum "setup.py" }}-{{ checksum "conda_env.yml"}}
           paths:
